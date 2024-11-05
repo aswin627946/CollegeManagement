@@ -15,6 +15,9 @@ def validate_file_size(file):
     max_size_mb = 1  # Set maximum file size to 1 MB
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError("File size cannot exceed 1 MB.")
+    
+    if not file.name.endswith('.pdf'):
+        raise ValidationError('Only PDF files are allowed.')
 
 import re
 def validate_batch_format(value):
