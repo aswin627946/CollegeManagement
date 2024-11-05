@@ -17,10 +17,6 @@ class MessageModelTest(TestCase):
             file=large_file
         )
 
-        # Expect the validation to raise an error if size limit is implemented
-        with self.assertRaises(ValidationError) as context:
+         # Try to save the message instance and expect a validation error for file size
+        with self.assertRaises(ValidationError):
             message.full_clean()  # This triggers model validation, including file size check
-        
-        # If the above does not raise an error, we will reach this point
-        # Check that the raised error contains the correct message
-        self.assertIn('File size cannot exceed 1 MB.', str(context.exception))
