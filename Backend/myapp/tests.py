@@ -3,7 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 from .models import Message
 
-class MessageModelTest(TestCase):
+class TestMessageModel(TestCase):
     def test_file_size_limit(self):
         # Create a file over 1 MB for testing
         large_file_content = b'a' * (1024 * 1024 + 1)  # 1 MB + 1 byte
