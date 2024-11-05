@@ -15,6 +15,16 @@ def validate_file_size(file):
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError("File size cannot exceed 1 MB.")
 
+import re
+def validate_batch_format(value):
+    # Check the length
+    if len(value) != 9:
+        raise ValidationError('Batch must be exactly 9 characters long.')
+    
+    # Check if the batch contains one hyphen and is numeric
+    if not re.match(r'^\d{4}-\d{4}$', value):
+        raise ValidationError('Batch must be in the format XXXX-XXXX where X is a digit.')
+
 class StudentInfo(models.Model):
     roll_no = models.CharField(max_length=255,primary_key=True)
     name = models.CharField(max_length=255)
@@ -95,7 +105,7 @@ class ClassInfo(models.Model):
     
 class FeeDefaulters(models.Model):
     department = models.CharField(max_length=255)
-    batch = models.CharField(max_length=255)
+    batch = models.CharField(max_length=9, validators=[validate_batch_format])
     roll_no = models.CharField(max_length=255)
 
     def __str__(self):
