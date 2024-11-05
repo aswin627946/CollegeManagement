@@ -1112,8 +1112,19 @@ def checkCertificateStatus(request):
 
 @api_view(['GET'])
 def getEachClassStudentsList(request):
-    department = request.GET.get('department')
+    # i commented this because i applied some mappings to department field
+    # department = request.GET.get('department')
+    # joiningYear = request.GET.get('joiningYear')
+
+    department = request.GET.get('department', '').lower()
     joiningYear = request.GET.get('joiningYear')
+    department_mapping = {
+        'computer science and engineering': 'cse',
+        'electronics and communication engineering': 'ece'
+    }
+    if department in department_mapping:
+        department = department_mapping[department]
+
     student_list = []
     students = StudentInfo.objects.filter(
         department=department, joining_year=joiningYear)
