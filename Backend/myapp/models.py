@@ -28,6 +28,10 @@ def validate_batch_format(value):
 def validate_semester(value):
     if value < 1 or value > 8:
         raise ValidationError('Semester must be between 1 and 8.')
+    
+def validate_contact_number(value):
+    if not re.fullmatch(r'\d{10}', value):
+        raise ValidationError('Contact number must be exactly 10 digits and contain only numeric characters.')
 
 class StudentInfo(models.Model):
     roll_no = models.CharField(max_length=255,primary_key=True)
@@ -36,7 +40,7 @@ class StudentInfo(models.Model):
     joining_year = models.CharField(max_length=255)
     blood_group = models.CharField(max_length=255)
     semester = models.IntegerField(validators=[validate_semester])
-    contact_number = models.CharField(max_length=255)
+    contact_number = models.CharField(max_length=255, validators=[validate_contact_number])
     address = models.TextField()
     gender = models.CharField(max_length=255)
     email = models.EmailField()
