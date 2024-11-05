@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 # from django.contrib.auth.models import AbstractUser
 # # Create your models here.
 
@@ -33,11 +34,18 @@ def validate_contact_number(value):
     if not re.fullmatch(r'\d{10}', value):
         raise ValidationError('Contact number must be exactly 10 digits and contain only numeric characters.')
 
+def validate_joining_year(value):
+    current_year = timezone.now().year
+    if not value.isdigit() or len(value) != 4 or int(value) > current_year:
+        raise ValidationError(
+            f'Joining year must be a 4-digit number and less than or equal to the current year ({current_year}).'
+        )
+
 class StudentInfo(models.Model):
     roll_no = models.CharField(max_length=255,primary_key=True)
     name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
-    joining_year = models.CharField(max_length=255)
+    joining_year = models.CharField(max_length=4, validators=[validate_joining_year])
     blood_group = models.CharField(max_length=255)
     semester = models.IntegerField(validators=[validate_semester])
     contact_number = models.CharField(max_length=255, validators=[validate_contact_number])
