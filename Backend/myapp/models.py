@@ -24,6 +24,10 @@ def validate_batch_format(value):
     # Check if the batch contains one hyphen and is numeric
     if not re.match(r'^\d{4}-\d{4}$', value):
         raise ValidationError('Batch must be in the format XXXX-XXXX where X is a digit.')
+    
+def validate_semester(value):
+    if value < 1 or value > 8:
+        raise ValidationError('Semester must be between 1 and 8.')
 
 class StudentInfo(models.Model):
     roll_no = models.CharField(max_length=255,primary_key=True)
@@ -31,7 +35,7 @@ class StudentInfo(models.Model):
     department = models.CharField(max_length=255)
     joining_year = models.CharField(max_length=255)
     blood_group = models.CharField(max_length=255)
-    semester = models.IntegerField()
+    semester = models.IntegerField(validators=[validate_semester])
     contact_number = models.CharField(max_length=255)
     address = models.TextField()
     gender = models.CharField(max_length=255)
