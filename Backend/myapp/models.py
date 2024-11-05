@@ -9,6 +9,12 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 #     def ___str___(self):
 #         return self.email
 
+from django.core.exceptions import ValidationError
+def validate_file_size(file):
+    max_size_mb = 1  # Set maximum file size to 1 MB
+    if file.size > max_size_mb * 1024 * 1024:
+        raise ValidationError("File size cannot exceed 1 MB.")
+
 class StudentInfo(models.Model):
     roll_no = models.CharField(max_length=255,primary_key=True)
     name = models.CharField(max_length=255)
@@ -165,7 +171,7 @@ class Message(models.Model):
     recipient = models.CharField(max_length=255)
     message_type = models.TextField()
     status = models.BooleanField(default=False)
-    file = models.FileField(upload_to='uploaded_files/', blank=True, null=True)
+    file = models.FileField(upload_to='uploaded_files/', blank=True, null=True, validators=[validate_file_size])
 
     def __str__(self):
         return f'{self.sender} to {self.recipient}: {self.message_type}'
