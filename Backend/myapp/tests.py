@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
-from .models import Message,StudentInfo
+from .models import Message,StudentInfo,FeeDefaulters
 from django.urls import reverse
 from rest_framework import status
 
@@ -75,3 +75,22 @@ class TestGetEachClassStudentsList(TestCase):
 
         # If the student list is not empty, print a success message
         print("The student list is not empty. Test passed.")
+
+class TestFeeDefaultersModel(TestCase):
+    def test_batch_validation(self):
+        # Define a list of invalid batch inputs
+        invalid_batches = [
+            '12345678',    # No hyphen
+            '1234-567',    # Not enough digits after hyphen
+            '1234-56789',  # Too many digits after hyphen
+            '12-34567',    # Too few digits before hyphen
+            '1234-12ab',   # Non-numeric characters
+            '1234-12345'   # More than 9 characters
+        ]
+
+        for batch in invalid_batches:
+            with self.assertRaises(ValidationError, msg=f"Test failed : Validation error not raised for batch: {batch}"):
+                fee_defaulter = FeeDefaulters(department='cse', batch=batch, roll_no='221111')
+                fee_defaulter.full_clean()  # This will trigger validation
+
+        print("Test Passed: All invalid batch inputs raised a ValidationError as expected.")
