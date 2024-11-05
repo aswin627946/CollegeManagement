@@ -1004,10 +1004,23 @@ def acceptMessage(request):
     sender = request.data.get('sender')
     message = Message.objects.get(sender=sender, message_type='Request for fee receipt')
     message.status = True
+    # i commented this because i added pdf size constraint
+    # if 'file' in request.FILES:
+    #     message.file = request.FILES['file']
+    #     message.save()
+    #     return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
+    # else:
+    #     message.save()
+    #     return Response({'status': 'Message accepted successfully'}, status=200)
     if 'file' in request.FILES:
         message.file = request.FILES['file']
-        message.save()
-        return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
+        # Call full_clean to trigger the validation
+        try:
+            message.full_clean()
+            message.save()
+            return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
+        except ValidationError as e:
+            return Response({'status': 'File size too large', 'errors': str(e)}, status=400)
     else:
         message.save()
         return Response({'status': 'Message accepted successfully'}, status=200)
@@ -1054,10 +1067,23 @@ def acceptCertificate(request):
     sender = request.data.get('sender')
     message = Message.objects.get(sender=sender, message_type='Request for Bonafide Certificate')
     message.status = True
+    # i commented this because i added pdf size constraint
+    # if 'file' in request.FILES:
+    #     message.file = request.FILES['file']
+    #     message.save()
+    #     return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
+    # else:
+    #     message.save()
+    #     return Response({'status': 'Message accepted successfully'}, status=200)
     if 'file' in request.FILES:
         message.file = request.FILES['file']
-        message.save()
-        return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
+        # Call full_clean to trigger the validation
+        try:
+            message.full_clean()
+            message.save()
+            return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
+        except ValidationError as e:
+            return Response({'status': 'File size too large', 'errors': str(e)}, status=400)
     else:
         message.save()
         return Response({'status': 'Message accepted successfully'}, status=200)
