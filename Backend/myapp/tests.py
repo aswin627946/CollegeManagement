@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from .models import Message,StudentInfo,FeeDefaulters
 from django.urls import reverse
 from rest_framework import status
+from datetime import datetime
 
 class TestMessageModel(TestCase):
     def test_file_size_limit(self):
@@ -145,3 +146,27 @@ class TestStudentInfoModel(TestCase):
 
         # If validation errors are raised for all invalid numbers, the test passes
         print("Test case passed: ValidationError raised for invalid contact numbers.")
+
+
+    def test_joining_year_validation(self):
+        # Test cases with invalid joining years
+        invalid_years = ['2025', '20xx', '123', '202', '20223', 'abcd']
+        
+        for year in invalid_years:
+            student = StudentInfo(
+                roll_no='123456',
+                name='John Doe',
+                department='cse',
+                joining_year=year,  # Invalid year
+                blood_group='O+',
+                semester=1,
+                contact_number='1234567890',
+                address='123 Street',
+                gender='Male',
+                email='john.doe@example.com'
+            )
+            with self.assertRaises(ValidationError,msg=f"Test case failed : Validation error not raised for joining year: {year}"):
+                student.full_clean()  # This will trigger the model validation
+        
+        # If validation errors are raised for all invalid joining years, the test passes
+        print("Test case passed: ValidationError raised for invalid joining years.")
