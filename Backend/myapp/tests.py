@@ -31,6 +31,22 @@ class TestMessageModel(TestCase):
             self.assertIn('File size cannot exceed 1 MB.', str(e))
             print("Test case passed: the file size constraint is implemented.")
 
+
+    def test_file_upload_pdf_validation(self):
+        # Create a valid PDF file
+        valid_pdf = SimpleUploadedFile("valid_file.pdf", b"PDF content", content_type='application/pdf')
+        message = Message(sender='student@example.com', recipient='admin', message_type='Request for fee receipt', file=valid_pdf)
+        message.full_clean()  # Should not raise ValidationError
+
+        # Create an invalid file (not a PDF)
+        invalid_file = SimpleUploadedFile("invalid_file.txt", b"Not a PDF content", content_type='text/plain')
+        message_invalid = Message(sender='student@example.com', recipient='admin', message_type='Request for fee receipt', file=invalid_file)
+        
+        with self.assertRaises(ValidationError,msg=f"Test case failed : Validation error not raised for non pdf file"):
+            message_invalid.full_clean()  # Should raise ValidationError
+
+        print("Test cases passed: ValidationError raised for invalid file type")
+
 class TestGetEachClassStudentsList(TestCase):
     def setUp(self):
         # Create test data
