@@ -120,3 +120,28 @@ class TestStudentInfoModel(TestCase):
 
         # If no validation error is raised for invalid semester, the test case will fail
         print("Test case passed: ValidationError raised for invalid semester.")
+
+    
+    def test_contact_number_validation(self):
+        # Try creating StudentInfo instances with invalid contact numbers
+        invalid_contact_numbers = ["123456789", "12345678901", "12345abcde", "abcdefghij"]
+        for contact_number in invalid_contact_numbers:
+            student = StudentInfo(
+                roll_no="S12345", 
+                name="Test Student", 
+                department="cse", 
+                joining_year="2024", 
+                blood_group="O+", 
+                semester=3, 
+                contact_number=contact_number,  # Invalid contact number
+                address="Test Address", 
+                gender="M", 
+                email="teststudent@example.com"
+            )
+
+            # Check if the ValidationError is raised
+            with self.assertRaises(ValidationError,msg=f"Test case failed : Validation error not raised for contact number: {contact_number}"):
+                student.full_clean()  # This will trigger the model validation
+
+        # If validation errors are raised for all invalid numbers, the test passes
+        print("Test case passed: ValidationError raised for invalid contact numbers.")
