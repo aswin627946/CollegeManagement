@@ -94,3 +94,29 @@ class TestFeeDefaultersModel(TestCase):
                 fee_defaulter.full_clean()  # This will trigger validation
 
         print("Test Passed: All invalid batch inputs raised a ValidationError as expected.")
+
+class TestStudentInfoModel(TestCase):
+    def test_semester_validation(self):
+        # Try creating a StudentInfo instance with invalid semester values
+        invalid_semesters = [0, 9, -1, 10]
+
+        for semester in invalid_semesters:
+            student = StudentInfo(
+                roll_no="S12345", 
+                name="Test Student", 
+                department="cse", 
+                joining_year="2024", 
+                blood_group="O+", 
+                semester=semester,  # Invalid semester
+                contact_number="1234567890", 
+                address="Test Address", 
+                gender="M", 
+                email="teststudent@example.com"
+            )
+
+            # Check if the ValidationError is raised
+            with self.assertRaises(ValidationError,msg=f"Test case failed : Validation error not raised for semester: {semester}"):
+                student.full_clean()  # This will trigger the model validation
+
+        # If no validation error is raised for invalid semester, the test case will fail
+        print("Test case passed: ValidationError raised for invalid semester.")

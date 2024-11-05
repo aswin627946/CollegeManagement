@@ -879,11 +879,19 @@ def search(request):
     else:
         return Response({'error': 'Please enter a search query with a minimum of 5 characters'}, status=400)
 
+# i wrote this function to validate batch in fee defaulters
+def validate_batch_format(batch):
+    # Check the length and format of the batch
+    return bool(re.match(r'^\d{4}-\d{4}$', batch)) 
 
 @api_view(['GET'])
 def getFeeDefaulters(request):
     department = request.GET.get('department')
     batch = request.GET.get('batch')
+    # Validate the batch format
+    if not validate_batch_format(batch):
+        return Response({'error': 'Invalid batch format. Batch must be in the format XXXX-XXXX, where X is a digit and has exactly one hyphen.'}, status=400)
+    
     student_list = []
     students = FeeDefaulters.objects.filter(department=department, batch=batch)
     print(students)
