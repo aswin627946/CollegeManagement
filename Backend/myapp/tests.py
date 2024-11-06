@@ -9,7 +9,10 @@ from rest_framework import status
 from datetime import datetime
 from rest_framework.test import APIClient
 from myapp.models import *
-
+from datetime import date
+from django.contrib.auth.models import User
+from .models import Login
+from .models import Todolist
 
 class TestMessageModel(TestCase):
     def test_file_size_limit(self):
@@ -403,19 +406,7 @@ class DataFetcher(TestCase):
             print("test_search_missing_query: FAILED")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
-from django.test import TestCase
-from django.urls import reverse
-from rest_framework.test import APIClient
-from rest_framework import status
-from .models import Absentees, CurrentCourses
-from datetime import date
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.urls import reverse
-from rest_framework.test import APIClient
-from rest_framework import status
-from .models import Login
-from .models import Todolist
+
 
 class InsertAttendanceTestCase(TestCase):
     def setUp(self):
@@ -579,7 +570,7 @@ class AuthTests(TestCase):
 
     def test_login_failure_wrong_username(self):
         # Test login with incorrect credentials
-        response = self.client.post(self.login_url, {'username': 'harsha', 'password': self.password})
+        response = self.client.post(self.login_url, {'username': 'asdfasdf', 'password': self.password})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(response.data['authenticated'])
 
