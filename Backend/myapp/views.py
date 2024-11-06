@@ -1512,7 +1512,7 @@ def addTimetableOriginal1(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['POST'])
-def addTimetableForPass(request):
+def addTimetable(request):
     serializer = TimeTableSerializer(data=request.data)
     if serializer.is_valid():
         semester = serializer.validated_data.get('semester')
@@ -1551,10 +1551,8 @@ def addTimetableForPass(request):
 
 
 @api_view(['POST'])
-def addTimetable(request):
-    print("here1")
+def addTimetableForFail(request):
     serializer = TimeTableSerializer(data=request.data)
-    print("here2")
     semester = serializer.initial_data.get('semester')
     # joining_yr = serializer.initial_data.get('joining_yr')
     department = serializer.initial_data.get('department')
@@ -1571,13 +1569,10 @@ def addTimetable(request):
         joining_yr=yrs[1]
     elif semester==7 or semester==8:
         joining_yr=yrs[0]
-    print("here3")
     # Check if the combination of semester, department, and day already exists
     if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
         return Response({'error': 'Timetable already exists for this semester, department, and day.'}, status=status.HTTP_400_BAD_REQUEST)
-    print("here4")
     # serializer.save()
-    print("here7")
     # day = serializer.initial_data.get('slot_4')
     # print(len(day))
     # validated_data = serializer.validated_data
