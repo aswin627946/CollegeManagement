@@ -23,25 +23,25 @@ from googleapiclient.errors import HttpError
 
 # authenticates us to connect with google calendar api 
 def calenderAccessAuth():
-    print('Hello')
+    # print('Hello')
     SCOPES = ["https://www.googleapis.com/auth/calendar"]
     creds = None
-    if os.path.exists("token.json"):
-        print('exists')
+    # if os.path.exists("token.json"):
+        # print('exists')
     try:
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
     except Exception as e:
         print("An error occurred while loading credentials:", e)
-    print(creds)
-    print('exe')
+    # print(creds)
+    # print('exe')
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
-        print('Why Here')
+        # print('Why Here')
         if creds and creds.expired and creds.refresh_token:
-            print("here2")
+            # print("here2")
             creds.refresh(Request())
         else:
-            print("here3")
+            # print("here3")
             flow = InstalledAppFlow.from_client_secrets_file(
                 "credentials.json", SCOPES
             )
@@ -49,9 +49,9 @@ def calenderAccessAuth():
         # Save the credentials for the next run
         with open("token.json", "w") as token:
             token.write(creds.to_json())
-        print(1)
-        print(creds)
-        print(2)
+        # print(1)
+        # print(creds)
+        # print(2)
     return creds
 
 #connects to calendar
@@ -61,7 +61,7 @@ def connectToCalender(joining_yr, department):
     calenders=['20d93d2fe1b0ecd1544f1a2b2b108da8e96af9ff12241d7492c3d65b24238790@group.calendar.google.com','42d1535640fbdeb2c505ba9b52315343dc907a3b2f91d4b9645b9b3805804828@group.calendar.google.com','aa4783b76409e5b9f2557220593a81e47854cb1f8692abe0a10754a7fde96202@group.calendar.google.com','a925c86f766b09ffa88d867653cafe9d55aaece2843c7f23657823807b2de584@group.calendar.google.com','41071f57b3a292eaa22f30e3f138487c6629af8d4504e280ea66ae2e4b99e65b@group.calendar.google.com','b4f926456995f1ce8e90e4038597f600fec71ca73c0745a0e56098dfacddc4c4@group.calendar.google.com','343a067515a7b486410df769c83cc58ec72b3b27bfeb68399c197b9ff448c09b@group.calendar.google.com','cefe6f3824e000eed77be01be2f930e92038c80b0a0e62bd56063e976aa85721@group.calendar.google.com']
     dept_mapping={'cse': 0,'ece':4}
     idx=dept_mapping[department.lower()]+yrs.index(joining_yr)
-    print(idx)
+    # print(idx)
     calender_id=calenders[idx]
 #     calender_id = '5cc47411b973f0be87683f090d88df0dbd791532b2990b02c89153f1e9b5e2bc@group.calendar.google.com'
     service = build("calendar", "v3", credentials=creds)
@@ -94,8 +94,8 @@ def calenderMainTableAdd(joining_yr,department, day, s1, s2, s3, s4, s5, s6, s7)
                     slot_to_time[i][0], '%H:%M').time()).isoformat())
                 end_datetime = str(datetime.combine(start_day, datetime.strptime(
                     slot_to_time[i][1], '%H:%M').time()).isoformat())
-                print(start_datetime)
-                print(end_datetime)
+                # print(start_datetime)
+                # print(end_datetime)
                 recurrence_rule = f'RRULE:FREQ=WEEKLY;BYDAY={byday_dict[day]};UNTIL={end_date.strftime("%Y%m%d")}'
                 event = {
                     'summary': summary_list[i],
@@ -104,7 +104,7 @@ def calenderMainTableAdd(joining_yr,department, day, s1, s2, s3, s4, s5, s6, s7)
                     'recurrence': [recurrence_rule],
                 }
                 event = service.events().insert(calendarId=calender_id, body=event).execute()
-                print('Event created: %s' % (event.get('htmlLink')))
+                # print('Event created: %s' % (event.get('htmlLink')))
     except HttpError as error:
         print(f"An error occurred: {error}")
 
@@ -138,14 +138,14 @@ def getEventsOnCond(date,course_code,joining_yr,department):
 #     department = 'cse'
     
 #     date = datetime.strptime(date, '%Y-%m-%d').date()
-    print('date1')
-    print(date)
+    # print('date1')
+    # print(date)
     date = datetime.strptime(date, '%d-%m-%Y').date()
-    print(date)
+    # print(date)
     service, calender_id = connectToCalender(joining_yr, department)
     page_token = None
     slots_today=[]
-    print('inside get event on cond')
+    # print('inside get event on cond')
     
     while True:
         events = service.events().list(calendarId=calender_id,
@@ -153,11 +153,11 @@ def getEventsOnCond(date,course_code,joining_yr,department):
         for event in events['items']:
             if date != None:
                 if event['start']['dateTime'][:10] == str(date)[:10] and event['summary']==course_code:
-                            print(event['start']['dateTime'])
+                            # print(event['start']['dateTime'])
                             slots_today.append(event['start']['dateTime'][11:16])
         page_token = events.get('nextPageToken')
         slots_today.sort()
-        print(slots_today)
+        # print(slots_today)
         if not page_token:
             break
     return slots_today
@@ -234,26 +234,26 @@ def getEventID(date, time_slot, joining_yr, department):
     # department = 'cse'
     date = str(date)[:10]
 
-    print(time_slot)
+    # print(time_slot)
     # change time from '09:20-10:10' format to '<date>T09:20:00'
     start_datetime = date+'T'+time_slot[:5]
     end_datetime = date+'T'+time_slot[6:]
-    print(start_datetime, end_datetime)
+    # print(start_datetime, end_datetime)
 
     service, calender_id = connectToCalender(joining_yr, department)
     # get event_id
     page_token = None
     event_id = None
     while True:
-        print("123")
-        print(service)
+        # print("123")
+        # print(service)
         events = service.events().list(calendarId=calender_id,
                                        pageToken=page_token, singleEvents=True).execute()
         for event in events['items']:
             # print(event['id'],event['summary'])
             # print(event['start'])
             # print(1)
-            print(event['start']['dateTime'][:16])
+            # print(event['start']['dateTime'][:16])
             # print('P',event['start']['dateTime'][:10],'P',str(date)[:10],'P')
             if event['start']['dateTime'][:16] == start_datetime:
                 # print(event['start'])
@@ -1512,7 +1512,7 @@ def addTimetableOriginal1(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['POST'])
-def addTimetable(request):
+def addTimetableForaPass(request):
     serializer = TimeTableSerializer(data=request.data)
     if serializer.is_valid():
         semester = serializer.validated_data.get('semester')
@@ -1546,18 +1546,16 @@ def addTimetable(request):
         
         return Response(serializer.data, status=201)
     else:
-        print(serializer.errors)
         return Response(serializer.errors, status=400)
 
 
 @api_view(['POST'])
-def addTimetableForFail(request):
+def addTimetable(request):
     serializer = TimeTableSerializer(data=request.data)
     semester = serializer.initial_data.get('semester')
     # joining_yr = serializer.initial_data.get('joining_yr')
     department = serializer.initial_data.get('department')
     day = serializer.initial_data.get('day')
-
     
     yrs = ['2021', '2022', '2023', '2024']
     joining_yr=None
@@ -1586,8 +1584,9 @@ def addTimetableForFail(request):
             semester=5
             joining_yr=yrs[1]
         if day=='':
-            day='monday'
-        calenderMainTableAdd(joining_yr, department, serializer.initial_data.get('day'), serializer.initial_data.get('slot_1'), serializer.initial_data.get('slot_2'), serializer.initial_data.get('slot_3'),serializer.initial_data.get('slot_4'), serializer.initial_data.get('slot_5'), serializer.initial_data.get('slot_6'), serializer.initial_data.get('slot_7'))
+            day="friday"
+            joining_yr=yrs[1]
+        calenderMainTableAdd(joining_yr, department, day, serializer.initial_data.get('slot_1'), serializer.initial_data.get('slot_2'), serializer.initial_data.get('slot_3'),serializer.initial_data.get('slot_4'), serializer.initial_data.get('slot_5'), serializer.initial_data.get('slot_6'), serializer.initial_data.get('slot_7'))
     elif joining_yr:
         return Response(serializer.initial_data, status=400)
     

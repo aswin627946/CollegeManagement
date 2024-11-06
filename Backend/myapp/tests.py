@@ -240,6 +240,7 @@ class TimetableTestCases(TestCase):
             slot_6=self.data['slot_6'],
             slot_7=self.data['slot_7']
         )
+
     def test_add_timetable_missing_semester_field(self): #TC4
         data = self.data.copy()
         data['semester']=0
@@ -254,7 +255,22 @@ class TimetableTestCases(TestCase):
 
     def test_add_timetable_missing_department_field(self): #TC4
         data = self.data.copy()
+        data['semester']=3
         data['department']=''
+        
+        response = self.client.post(self.url, data, format='json')
+        try:
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            print("test_add_timetable_missing_semester_field: PASSED")
+        except AssertionError:
+            print("test_add_timetable_missing_semester_field: FAILED")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_add_timetable_missing_day_field(self): #TC4
+        data = self.data.copy()
+        data['semester']=3
+        data['department']='CSE'
+        data['day']=''
         
         response = self.client.post(self.url, data, format='json')
         try:
