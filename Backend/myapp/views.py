@@ -853,7 +853,7 @@ def getTimetableForStudent(request):
 @api_view(['GET'])
 def search(request):
     search_query = request.GET.get('searchText')
-    if search_query:
+    if search_query and len(search_query) >= 5:
         student_results = StudentInfo.objects.filter(
             name__icontains=search_query)
         faculty_results = FacultyInfo.objects.filter(
