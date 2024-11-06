@@ -1534,13 +1534,17 @@ def addTimetable(request):
         # Check if the combination of semester, department, and day already exists
         if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
             return Response({'error': 'Timetable already exists for this semester, department, and day.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        departments=['CSE','ECE']
+        if department not in departments:
+            department='CSE'
         serializer.save()
         # day = serializer.data.get('slot_4')
         # print(len(day))
         # validated_data = serializer.validated_data
         # ###
         if joining_yr!=None:
-            calenderMainTableAdd(joining_yr, serializer.data.get('department'), serializer.data.get('day'), serializer.data.get('slot_1'), serializer.data.get('slot_2'), serializer.data.get('slot_3'),serializer.data.get('slot_4'), serializer.data.get('slot_5'), serializer.data.get('slot_6'), serializer.data.get('slot_7'))
+            calenderMainTableAdd(joining_yr, department, serializer.data.get('day'), serializer.data.get('slot_1'), serializer.data.get('slot_2'), serializer.data.get('slot_3'),serializer.data.get('slot_4'), serializer.data.get('slot_5'), serializer.data.get('slot_6'), serializer.data.get('slot_7'))
         else:
             return Response(serializer.data, status=400)
         
