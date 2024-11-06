@@ -197,7 +197,7 @@ class TimetableAPICallTestCase(TestCase): # TC1
 
     def test_view_status_code(self):
         status_code=None
-        
+
         try:
             url = reverse('getTimetableForStudent')
             response = self.client.get(url, {'semester': self.semester, 'department': self.department})
@@ -207,3 +207,47 @@ class TimetableAPICallTestCase(TestCase): # TC1
         except Exception as e:
             print("test_view_status_code: FAILED")
             self.assertEqual(status_code, status.HTTP_200_OK)
+
+
+class TimetableTestCases(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse('addTimetable')
+        # self.url = reverse('addTimetableforFail')
+        
+        self.data = {
+            'semester': 3,
+            'department': 'CSE',
+            'day': 'friday',
+            'slot_1': 'cs101',
+            'slot_2': 'cs102',
+            'slot_3': 'cs103',
+            'slot_4': 'cs104',
+            'slot_5': 'cs201',
+            'slot_6': 'cs202',
+            'slot_7': 'cs203'
+        }
+        
+        TimeTable.objects.create(
+            semester=self.data['semester'],
+            department=self.data['department'],
+            day=self.data['day'],
+            slot_1=self.data['slot_1'],
+            slot_2=self.data['slot_2'],
+            slot_3=self.data['slot_3'],
+            slot_4=self.data['slot_4'],
+            slot_5=self.data['slot_5'],
+            slot_6=self.data['slot_6'],
+            slot_7=self.data['slot_7']
+        )
+    def test_add_timetable_missing_semester_field(self): #TC4
+        data = self.data.copy()
+        data['semester']=0
+        
+        response = self.client.post(self.url, data, format='json')
+        try:
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            print("test_add_timetable_missing_semester_field: PASSED")
+        except AssertionError:
+            print("test_add_timetable_missing_semester_field: FAILED")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
