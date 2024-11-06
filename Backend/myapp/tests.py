@@ -334,4 +334,12 @@ class DataFetcher(TestCase):
         self.assertEqual(len(response.data['search_list']), 1)
         self.assertEqual(response.data['search_list'][0]['name'], "Alice Johnson")
         print("test_search_with_valid_query: PASSED")
-
+    
+    def test_search_query_too_short(self): # TC2
+        response = self.client.get(self.url, {'searchText': 'Ali'})
+        try:
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            print("test_search_query_too_short: PASSED")
+        except AssertionError:
+            print("test_search_query_too_short: FAILED")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
