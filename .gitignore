@@ -1,3 +1,4 @@
 Backend/credentials.json
 Backend/token.json
 node_modules
+*.pyc
