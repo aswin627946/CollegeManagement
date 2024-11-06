@@ -1529,7 +1529,7 @@ def addTimetable(request):
             joining_yr=yrs[2]
         elif semester==5 or semester==6:
             joining_yr=yrs[1]
-        elif semester>=7:
+        elif semester==7 or semester==8:
             joining_yr=yrs[0]
         # Check if the combination of semester, department, and day already exists
         if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
