@@ -21,6 +21,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+# Validation
+from django.core.exceptions import ValidationError
+
+
 # authenticates us to connect with google calendar api 
 def calenderAccessAuth():
     # print('Hello')
@@ -849,8 +853,13 @@ def addResult(request) :
         end_sem=record['end_sem']
         grade=record['grade']
         roll_no=record['roll_no']
-        obj=Result(course_code=course_code,faculty=faculty,ct_1=ct_1,ct_2=ct_2,assignments=assignments,end_sem=end_sem,grade=grade,roll_no=roll_no)
-        obj.save()
+
+        try:
+            obj=Result(course_code=course_code,faculty=faculty,ct_1=ct_1,ct_2=ct_2,assignments=assignments,end_sem=end_sem,grade=grade,roll_no=roll_no)
+            obj.full_clean()
+            obj.save()
+        except ValidationError as e:
+            return Response({'errors': e.message_dict}, status=status.HTTP_400_BAD_REQUEST)  # e.message_dict has field-specific errors
     return Response({})
 
 
@@ -1646,11 +1655,16 @@ def addResultLab(request) :
         course_code=record['course_code']
         faculty=record['faculty']
         internal_marks=record['internal_marks']
-        end_lab=record['internal_marks']
+        end_lab=record['end_lab']
         grade=record['grade']
         roll_no=record['roll_no']
-        obj=LabResult(course_code=course_code,faculty=faculty,internal_marks=internal_marks,end_lab=end_lab,grade=grade,roll_no=roll_no)
-        obj.save()
+
+        try:
+            obj=LabResult(course_code=course_code,faculty=faculty,internal_marks=internal_marks,end_lab=end_lab,grade=grade,roll_no=roll_no)
+            obj.full_clean()
+            obj.save()
+        except ValidationError as e:
+            return Response({'errors':e.message_dict},status.HTTP_400_BAD_REQUEST)
     return Response({})
 
 

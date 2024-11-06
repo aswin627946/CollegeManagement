@@ -11,7 +11,7 @@ from rest_framework.test import APIClient
 from myapp.models import *
 from datetime import date
 from django.contrib.auth.models import User
-from .models import Login
+from .models import Login,Result,LabResult
 from .models import Todolist
 
 class TestMessageModel(TestCase):
@@ -647,4 +647,108 @@ class TodolistTests(TestCase):
         # Verify the response (could be handled with a 400 if validation is added)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['todos_details']), 0)
+
+class ResultTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.add_result_url = '/api/addResult/'
+        self.get_result_url = '/api/getResultForStudentForCourse/'
+        self.add_result_lab_url = '/api/addResultLab/'
+        self.get_lab_result_url = '/api/getLabResultForStudentForCourse/'
+        
+        # Sample data for Result
+        self.result_data = [
+            {
+                'course_code': 'CS101',
+                'faculty': 'Dr. Smith',
+                'ct_1': 18,
+                'ct_2': 17,
+                'assignments': 9,
+                'end_sem': 45,
+                'grade': 'A',
+                'roll_no': '123456'
+            }
+        ]
+        
+        # Sample data for LabResult
+        self.lab_result_data = [
+            {
+                'course_code': 'CS102',
+                'faculty': 'Dr. Jones',
+                'internal_marks': 35,
+                'end_lab': 37,
+                'grade': 'A',
+                'roll_no': '123456'
+            }
+        ]
+
+    def test_add_result(self):
+        response = self.client.post(self.add_result_url, self.result_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_result_for_student_for_course(self):
+        # Add result first to retrieve it
+        self.client.post(self.add_result_url, self.result_data, format='json')
+        response = self.client.get(self.get_result_url, {'course_code': 'CS101', 'roll_no': '123456'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['ct_1'], 18)
+        self.assertEqual(response.data['ct_2'], 17)
+        self.assertEqual(response.data['assignments'], 9)
+        self.assertEqual(response.data['end_sem'], 45)
+        self.assertEqual(response.data['grade'], 'A')
+
+    def test_add_result_lab(self):
+        response = self.client.post(self.add_result_lab_url, self.lab_result_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_lab_result_for_student_for_course(self):
+        # Add lab result first to retrieve it
+        self.client.post(self.add_result_lab_url, self.lab_result_data, format='json')
+        response = self.client.get(self.get_lab_result_url, {'course_code': 'CS102', 'roll_no': '123456'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['internal_marks'], 35)
+        self.assertEqual(response.data['end_lab'], 37)
+        self.assertEqual(response.data['grade'], 'A')
+
+    def test_result_deletion_before_adding(self):
+        # Ensure old results are deleted before adding new ones
+        self.client.post(self.add_result_url, self.result_data, format='json')
+        self.assertEqual(Result.objects.count(), 1)
+
+    def test_lab_result_deletion_before_adding(self):
+        # Ensure old lab results are deleted before adding new ones
+        self.client.post(self.add_result_lab_url, self.lab_result_data, format='json')
+        self.assertEqual(LabResult.objects.count(), 1)
+
+    def test_result_ct_1_exceeds_max(self):
+        # Test that exceeding max for ct_1 returns a 400 status
+        invalid_data = [
+            {**self.result_data[0], 'ct_1': 25}  # Exceeds max of 20
+        ]
+        response = self.client.post(self.add_result_url, invalid_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_lab_result_negative_end_lab(self):
+        # Test that negative end_lab returns a 400 status
+        invalid_data = [
+            {**self.lab_result_data[0], 'end_lab': -5}  # Negative value not allowed
+        ]
+        response = self.client.post(self.add_result_lab_url, invalid_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_result_grade_format(self):
+        # Test that adding a result with an invalid grade format returns a 400 status
+        invalid_data = [
+            {**self.result_data[0], 'grade': 'InvalidGrade'}
+        ]
+        response = self.client.post(self.add_result_url, invalid_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_lab_result_grade_format(self):
+        # Test that adding a lab result with an invalid grade format returns a 400 status
+        invalid_data = [
+            {**self.lab_result_data[0], 'grade': 'InvalidGrade'}
+        ]
+        response = self.client.post(self.add_result_lab_url, invalid_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator,RegexValidator
 from django.utils import timezone
 # from django.contrib.auth.models import AbstractUser
 # # Create your models here.
@@ -107,7 +107,10 @@ class Result(models.Model):
     ct_2 = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)])
     assignments = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)])
     end_sem = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(50)])
-    grade = models.CharField(max_length=255)
+    grade = models.CharField(
+        max_length=2,
+        validators=[RegexValidator(regex=r'^[ABCDEF|S]{1,2}$', message='Grade must be one of the following: A, B, C, D, E, F, S')]
+    )
     roll_no = models.CharField(max_length=255)
 
     def __str__(self):
@@ -224,10 +227,13 @@ class FacultyTimeTable(models.Model):
 class LabResult(models.Model) :
     course_code=models.CharField(max_length=250)
     faculty=models.CharField(max_length=140)
-    internal_marks=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(40)])
-    end_lab=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(40)])
+    internal_marks=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(50)])
+    end_lab=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(50)])
     roll_no=models.CharField(max_length=50)
-    grade=models.CharField(max_length=150)
+    grade = models.CharField(
+        max_length=2,
+        validators=[RegexValidator(regex=r'^[ABCDEF|S]{1,2}$', message='Grade must be one of the following: A, B, C, D, E, F, S')]
+    )
 
     def __str__(self):
         return self.course_code+' '+self.roll_no
