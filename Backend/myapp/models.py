@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 # from django.contrib.auth.models import AbstractUser
 # # Create your models here.
 
@@ -9,14 +10,48 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 #     def ___str___(self):
 #         return self.email
 
+from django.core.exceptions import ValidationError
+def validate_file_size(file):
+    max_size_mb = 1  # Set maximum file size to 1 MB
+    if file.size > max_size_mb * 1024 * 1024:
+        raise ValidationError("File size cannot exceed 1 MB.")
+    
+    if not file.name.endswith('.pdf'):
+        raise ValidationError('Only PDF files are allowed.')
+
+import re
+def validate_batch_format(value):
+    # Check the length
+    if len(value) != 9:
+        raise ValidationError('Batch must be exactly 9 characters long.')
+    
+    # Check if the batch contains one hyphen and is numeric
+    if not re.match(r'^\d{4}-\d{4}$', value):
+        raise ValidationError('Batch must be in the format XXXX-XXXX where X is a digit.')
+    
+def validate_semester(value):
+    if value < 1 or value > 8:
+        raise ValidationError('Semester must be between 1 and 8.')
+    
+def validate_contact_number(value):
+    if not re.fullmatch(r'\d{10}', value):
+        raise ValidationError('Contact number must be exactly 10 digits and contain only numeric characters.')
+
+def validate_joining_year(value):
+    current_year = timezone.now().year
+    if not value.isdigit() or len(value) != 4 or int(value) > current_year:
+        raise ValidationError(
+            f'Joining year must be a 4-digit number and less than or equal to the current year ({current_year}).'
+        )
+
 class StudentInfo(models.Model):
     roll_no = models.CharField(max_length=255,primary_key=True)
     name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
-    joining_year = models.CharField(max_length=255)
+    joining_year = models.CharField(max_length=4, validators=[validate_joining_year])
     blood_group = models.CharField(max_length=255)
-    semester = models.IntegerField()
-    contact_number = models.CharField(max_length=255)
+    semester = models.IntegerField(validators=[validate_semester])
+    contact_number = models.CharField(max_length=255, validators=[validate_contact_number])
     address = models.TextField()
     gender = models.CharField(max_length=255)
     email = models.EmailField()
@@ -89,7 +124,7 @@ class ClassInfo(models.Model):
     
 class FeeDefaulters(models.Model):
     department = models.CharField(max_length=255)
-    batch = models.CharField(max_length=255)
+    batch = models.CharField(max_length=9, validators=[validate_batch_format])
     roll_no = models.CharField(max_length=255)
 
     def __str__(self):
@@ -165,7 +200,7 @@ class Message(models.Model):
     recipient = models.CharField(max_length=255)
     message_type = models.TextField()
     status = models.BooleanField(default=False)
-    file = models.FileField(upload_to='uploaded_files/', blank=True, null=True)
+    file = models.FileField(upload_to='uploaded_files/', blank=True, null=True, validators=[validate_file_size])
 
     def __str__(self):
         return f'{self.sender} to {self.recipient}: {self.message_type}'
