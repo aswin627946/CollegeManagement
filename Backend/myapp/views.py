@@ -1537,7 +1537,8 @@ def addTimetable(request):
         
         departments=['CSE','ECE']
         if department not in departments:
-            department='CSE'
+            return Response({'error': 'Invalid Department.'}, status=status.HTTP_400_BAD_REQUEST)
+    
         serializer.save()
         # day = serializer.data.get('slot_4')
         # print(len(day))
