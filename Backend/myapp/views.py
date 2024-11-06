@@ -1531,6 +1531,9 @@ def addTimetable(request):
             joining_yr=yrs[1]
         elif semester==7 or semester==8:
             joining_yr=yrs[0]
+        # Check if the combination of semester, department, and day already exists
+        if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
+            return Response({'error': 'Timetable already exists for this semester, department, and day.'}, status=status.HTTP_400_BAD_REQUEST)
         
         departments=['CSE','ECE']
         if department not in departments:
