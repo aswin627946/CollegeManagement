@@ -390,3 +390,13 @@ class DataFetcher(TestCase):
         except AssertionError:
             print("test_search_multiple_results: FAILED")
             self.assertEqual(len(response.data['search_list']), 2)
+
+    def test_search_missing_query(self):
+        response = self.client.get(self.url)
+        try:
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            print("test_search_missing_query: PASSED")
+        except AssertionError:
+            print("test_search_missing_query: FAILED")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    

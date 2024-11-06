@@ -853,6 +853,7 @@ def getTimetableForStudent(request):
 @api_view(['GET'])
 def search(request):
     search_query = request.GET.get('searchText')
+    search_list = []
     if search_query and len(search_query) >= 5:
         student_results = StudentInfo.objects.filter(
             name__icontains=search_query)
@@ -862,7 +863,6 @@ def search(request):
             name__icontains=search_query)
         # Combine search results into a single list
         # search_results = list(student_results.values()) + list(faculty_results.values())
-        search_list = []
         for search_obj in student_results:
             search_list.append({'name': search_obj.name, 'roll_no': search_obj.roll_no, 'department': search_obj.department,
                                'semester': search_obj.semester, 'joining_year': search_obj.joining_year, 'email': search_obj.email})
@@ -872,9 +872,9 @@ def search(request):
         for search_obj in admin_results:
             search_list.append({'name': search_obj.name, 'position': search_obj.position,
                                'staff_id': search_obj.staff_id, 'email': search_obj.email})
-        return Response({'search_list': search_list})
-    else:
-        return Response({'error': 'Please enter a search query with a minimum of 5 characters'}, status=400)
+    return Response({'search_list': search_list})
+    # else:
+    #     return Response({'error': 'Please enter a search query with a minimum of 5 characters'}, status=400)
 
 # i wrote this function to validate batch in fee defaulters
 def validate_batch_format(batch):
