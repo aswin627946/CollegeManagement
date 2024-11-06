@@ -304,3 +304,13 @@ class TimetableTestCases(TestCase):
         except AssertionError:
             print("test_add_timetable_invalid_department_data: FAILED")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_add_duplicate_timetable_entry(self): #TC2
+        response = self.client.post(self.url, self.data, format='json')
+        try:
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            print("test_donot_add_duplicate_timetable_entry: PASSED")
+        except AssertionError:
+            print("test_donot_add_duplicate_timetable_entry: FAILED")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
