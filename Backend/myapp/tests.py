@@ -1,10 +1,12 @@
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
-from .models import Message,StudentInfo,FeeDefaulters
 from django.urls import reverse
 from rest_framework import status
 from datetime import datetime
+from rest_framework.test import APIClient
+from myapp.models import *
+
 
 class TestMessageModel(TestCase):
     def test_file_size_limit(self):
@@ -186,3 +188,21 @@ class TestStudentInfoModel(TestCase):
         
         # If validation errors are raised for all invalid joining years, the test passes
         print("Test case passed: ValidationError raised for invalid joining years.")
+
+class TimetableAPICallTestCase(TestCase): # TC1
+    def setUp(self):
+        self.client = APIClient()
+        self.semester = '3'
+        self.department = 'cse'
+
+    def test_view_status_code(self):
+        status_code=None
+        try:
+            url = reverse('getTimetableForStudent')
+            response = self.client.get(url, {'semester': self.semester, 'department': self.department})
+            status_code=response.status_code
+            self.assertEqual(status_code, status.HTTP_200_OK)
+            print("test_view_status_code: PASSED")
+        except Exception as e:
+            print("test_view_status_code: FAILED")
+            self.assertEqual(status_code, status.HTTP_200_OK)
