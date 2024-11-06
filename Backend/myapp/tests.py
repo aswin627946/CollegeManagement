@@ -251,3 +251,15 @@ class TimetableTestCases(TestCase):
         except AssertionError:
             print("test_add_timetable_missing_semester_field: FAILED")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_add_timetable_missing_department_field(self): #TC4
+        data = self.data.copy()
+        data['department']=''
+        
+        response = self.client.post(self.url, data, format='json')
+        try:
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            print("test_add_timetable_missing_semester_field: PASSED")
+        except AssertionError:
+            print("test_add_timetable_missing_semester_field: FAILED")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
