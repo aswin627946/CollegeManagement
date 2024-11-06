@@ -1512,7 +1512,7 @@ def addTimetableOriginal1(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['POST'])
-def addTimetableForaPass(request):
+def addTimetable(request):
     serializer = TimeTableSerializer(data=request.data)
     if serializer.is_valid():
         semester = serializer.validated_data.get('semester')
@@ -1550,7 +1550,7 @@ def addTimetableForaPass(request):
 
 
 @api_view(['POST'])
-def addTimetable(request):
+def addTimetableForFail(request):
     serializer = TimeTableSerializer(data=request.data)
     semester = serializer.initial_data.get('semester')
     # joining_yr = serializer.initial_data.get('joining_yr')
