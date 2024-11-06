@@ -197,6 +197,7 @@ class TimetableAPICallTestCase(TestCase): # TC1
 
     def test_view_status_code(self):
         status_code=None
+        
         try:
             url = reverse('getTimetableForStudent')
             response = self.client.get(url, {'semester': self.semester, 'department': self.department})
