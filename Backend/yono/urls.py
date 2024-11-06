@@ -38,7 +38,7 @@ urlpatterns = [
     path('api/reschedule_class/', reschedule_class, name='reschedule_class'),
     path('api/add_or_change_class/', add_or_change_class,name='add_or_change_class'),
     path('api/cancel_class/', cancel_class, name='cancel_class'),
-    path('api/getTimetableForStudent/',getTimetableForStudent,name="getTimetableForStuden"),
+    path('api/getTimetableForStudent/',getTimetableForStudent,name="getTimetableForStudent"),
     path('api/getCalendarId/',getCalendarId,name="getCalendarId"),
 
     # mahitha
