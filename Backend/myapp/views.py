@@ -1101,7 +1101,7 @@ def acceptMessage(request):
             message.save()
             return Response({'status': 'Message accepted and file uploaded successfully'}, status=200)
         except ValidationError as e:
-            return Response({'status': 'File size too large', 'errors': str(e)}, status=400)
+            return Response({'status': 'File size too large or it is not pdf type', 'errors': str(e)}, status=400)
     else:
         message.save()
         return Response({'status': 'Message accepted successfully'}, status=200)
@@ -1252,19 +1252,38 @@ def addNewStudent(request):
     department=department.lower()
     
     obj = StudentInfo(roll_no=roll_no, name=name, department=department, joining_year=joining_year, blood_group=blood_group, semester=semester, contact_number=contact_number, address=address, gender=gender, email=email)
-    obj.save()
     
-    login_obj = Login(email=email, type_of_user='student')
-    login_obj.save()
-    
-    username = email
-    password = email[:6]
-    
-    if not User.objects.filter(username=username).exists():
-        user = User.objects.create_user(username=username, password=password)
-        user.save()
-    
-    return Response({'status': 'Saved Successfully'}, status=200)
+    # i commented this because i added some constraints in studentinfo table on joiningyear,contactnumber,semester so i need to check that also
+    # obj.save()
+    # login_obj = Login(email=email, type_of_user='student')
+    # login_obj.save()
+    # username = email
+    # password = email[:6]
+    # if not User.objects.filter(username=username).exists():
+    #     user = User.objects.create_user(username=username, password=password)
+    #     user.save()
+    # return Response({'status': 'Saved Successfully'}, status=200)
+
+    try:
+        # Validate the model instance
+        obj.full_clean()  # This will run all field validators and raise ValidationError if any fail.
+        obj.save()  # Save only if validation is successful
+
+        login_obj = Login(email=email, type_of_user='student')
+        login_obj.save()
+
+        username = email
+        password = email[:6]
+        if not User.objects.filter(username=username).exists():
+            user = User.objects.create_user(username=username, password=password)
+            user.save()
+
+        return Response({'status': 'Saved Successfully'}, status=200)
+
+    except ValidationError as e:
+        # Catch validation errors and return them as a response
+        errors = {field: error for field, error in e.message_dict.items()}
+        return Response({'status': 'Validation Error', 'errors': errors}, status=400)
 
 
 from django.utils import timezone
