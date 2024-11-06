@@ -314,3 +314,24 @@ class TimetableTestCases(TestCase):
             print("test_donot_add_duplicate_timetable_entry: FAILED")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
+
+class DataFetcher(TestCase):
+    def setUp(self):
+        # Set up the API client and initial data for the tests
+        self.client = APIClient()
+        self.url = reverse('search')
+
+        
+        # Create sample data in the database
+        StudentInfo.objects.create(name="Alice Johnson", roll_no="2022001", department="CSE", semester=3, joining_year=2021, email="alice@example.com")
+        FacultyInfo.objects.create(name="Dr. Bob Miller", faculty_id="F002", position="Professor", description="Physics faculty", designation="Professor", email="bob.miller@example.com")
+        AdministrationInfo.objects.create(name="Charlie Brown", position="Principal", staff_id="A003", email="charlie.brown@example.com")
+
+    def test_search_with_valid_query(self): #TC1
+        response = self.client.get(self.url, {'searchText': 'Alice'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('search_list', response.data)
+        self.assertEqual(len(response.data['search_list']), 1)
+        self.assertEqual(response.data['search_list'][0]['name'], "Alice Johnson")
+        print("test_search_with_valid_query: PASSED")
+

@@ -854,7 +854,6 @@ def getTimetableForStudent(request):
 def search(request):
     search_query = request.GET.get('searchText')
     if search_query and len(search_query) >= 5:
-        print(search_query)
         student_results = StudentInfo.objects.filter(
             name__icontains=search_query)
         faculty_results = FacultyInfo.objects.filter(
@@ -1469,47 +1468,47 @@ def getTimeSlotForFaculty(request):
 #         print(serializer.errors)
 #         return Response(serializer.errors, status=400)
 
-@api_view(['POST'])
-def addTimetableOriginal(request):
-    print("her1")
-    serializer = TimeTableSerializer(data=request.data)
-    if serializer.is_valid():
-        print("here2")
-        semester = serializer.validated_data.get('semester')
-        # joining_yr = serializer.validated_data.get('joining_yr')
-        department = serializer.validated_data.get('department')
-        day = serializer.validated_data.get('day')
+# @api_view(['POST'])
+# def addTimetableOriginal(request):
+#     print("her1")
+#     serializer = TimeTableSerializer(data=request.data)
+#     if serializer.is_valid():
+#         print("here2")
+#         semester = serializer.validated_data.get('semester')
+#         # joining_yr = serializer.validated_data.get('joining_yr')
+#         department = serializer.validated_data.get('department')
+#         day = serializer.validated_data.get('day')
 
         
-        # yrs = ['2021', '2022', '2023', '2024']
-        yrs = ['2023', '2022', '2021', '2020']
-        joining_yr=None
-        if semester==1 or semester==2:
-            joining_yr=yrs[0]
-        elif semester==3 or semester==4:
-            joining_yr=yrs[1]
-        elif semester==5 or semester==6:
-            joining_yr=yrs[2]
-        elif semester==7 or semester==8:
-            joining_yr=yrs[3]
-        print("here3")
-        # Check if the combination of semester, department, and day already exists
-        if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
-            return Response({'error': 'Timetable already exists for this semester, department, and day.'}, status=status.HTTP_400_BAD_REQUEST)
-        print("here4")
-        serializer.save()
-        print("here7")
-        # day = serializer.data.get('slot_4')
-        # print(len(day))
-        # validated_data = serializer.validated_data
-        # ###
-        calenderMainTableAdd(joining_yr, serializer.data.get('department'), serializer.data.get('day'), serializer.data.get('slot_1'), serializer.data.get('slot_2'), serializer.data.get('slot_3'),serializer.data.get('slot_4'), serializer.data.get('slot_5'), serializer.data.get('slot_6'), serializer.data.get('slot_7'))
+#         # yrs = ['2021', '2022', '2023', '2024']
+#         yrs = ['2023', '2022', '2021', '2020']
+#         joining_yr=None
+#         if semester==1 or semester==2:
+#             joining_yr=yrs[0]
+#         elif semester==3 or semester==4:
+#             joining_yr=yrs[1]
+#         elif semester==5 or semester==6:
+#             joining_yr=yrs[2]
+#         elif semester==7 or semester==8:
+#             joining_yr=yrs[3]
+#         print("here3")
+#         # Check if the combination of semester, department, and day already exists
+#         if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
+#             return Response({'error': 'Timetable already exists for this semester, department, and day.'}, status=status.HTTP_400_BAD_REQUEST)
+#         print("here4")
+#         serializer.save()
+#         print("here7")
+#         # day = serializer.data.get('slot_4')
+#         # print(len(day))
+#         # validated_data = serializer.validated_data
+#         # ###
+#         calenderMainTableAdd(joining_yr, serializer.data.get('department'), serializer.data.get('day'), serializer.data.get('slot_1'), serializer.data.get('slot_2'), serializer.data.get('slot_3'),serializer.data.get('slot_4'), serializer.data.get('slot_5'), serializer.data.get('slot_6'), serializer.data.get('slot_7'))
 
-        return Response(serializer.data, status=201)
-    else:
-        print("here5")
-        print(serializer.errors)
-        return Response(serializer.errors, status=400)
+#         return Response(serializer.data, status=201)
+#     else:
+#         print("here5")
+#         print(serializer.errors)
+#         return Response(serializer.errors, status=400)
     
 @api_view(['POST'])
 def addTimetable(request):
@@ -1552,51 +1551,6 @@ def addTimetable(request):
         return Response(serializer.data, status=201)
     else:
         return Response(serializer.errors, status=400)
-
-
-@api_view(['POST'])
-def addTimetableForFail(request):
-    serializer = TimeTableSerializer(data=request.data)
-    semester = serializer.initial_data.get('semester')
-    # joining_yr = serializer.initial_data.get('joining_yr')
-    department = serializer.initial_data.get('department')
-    day = serializer.initial_data.get('day')
-    
-    yrs = ['2021', '2022', '2023', '2024']
-    joining_yr=None
-    if semester==1 or semester==2:
-        joining_yr=yrs[3]
-    elif semester==3 or semester==4:
-        joining_yr=yrs[2]
-    elif semester==5 or semester==6:
-        joining_yr=yrs[1]
-    elif semester==7 or semester==8:
-        joining_yr=yrs[0]
-    # Check if the combination of semester, department, and day already exists
-    if TimeTable.objects.filter(semester=semester, department=department, day=day).exists():
-        return Response({'error': 'Timetable already exists for this semester, department, and day.'}, status=status.HTTP_400_BAD_REQUEST)
-    # serializer.save()
-    # day = serializer.initial_data.get('slot_4')
-    # print(len(day))
-    # validated_data = serializer.validated_data
-    # ###
-    department=serializer.initial_data.get('department')
-
-    if joining_yr!=None:
-        if department=='':
-            department='CSE'
-        if semester==0:
-            semester=5
-            joining_yr=yrs[1]
-        if day=='':
-            day="friday"
-            joining_yr=yrs[1]
-        calenderMainTableAdd(joining_yr, department, day, serializer.initial_data.get('slot_1'), serializer.initial_data.get('slot_2'), serializer.initial_data.get('slot_3'),serializer.initial_data.get('slot_4'), serializer.initial_data.get('slot_5'), serializer.initial_data.get('slot_6'), serializer.initial_data.get('slot_7'))
-    elif joining_yr:
-        return Response(serializer.initial_data, status=400)
-    
-    return Response(serializer.initial_data, status=201)
-    
 
 
 @api_view(['GET'])
