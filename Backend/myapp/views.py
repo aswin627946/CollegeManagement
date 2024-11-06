@@ -872,6 +872,8 @@ def search(request):
         for search_obj in admin_results:
             search_list.append({'name': search_obj.name, 'position': search_obj.position,
                                'staff_id': search_obj.staff_id, 'email': search_obj.email})
+        if not search_list:
+            search_list.append('None')
         return Response({'search_list': search_list})
     else:
         return Response({'error': 'Please enter a search query with a minimum of 5 characters'}, status=400)

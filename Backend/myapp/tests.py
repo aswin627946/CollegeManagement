@@ -327,7 +327,7 @@ class DataFetcher(TestCase):
         FacultyInfo.objects.create(name="Dr. Bob Miller", faculty_id="F002", position="Professor", description="Physics faculty", designation="Professor", email="bob.miller@example.com")
         AdministrationInfo.objects.create(name="Charlie Brown", position="Principal", staff_id="A003", email="charlie.brown@example.com")
 
-    def test_search_with_valid_query(self): #TC1
+    def test_search_with_valid_query(self):
         response = self.client.get(self.url, {'searchText': 'Alice'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('search_list', response.data)
@@ -335,7 +335,7 @@ class DataFetcher(TestCase):
         self.assertEqual(response.data['search_list'][0]['name'], "Alice Johnson")
         print("test_search_with_valid_query: PASSED")
     
-    def test_search_query_too_short(self): # TC2
+    def test_search_query_too_short(self):
         response = self.client.get(self.url, {'searchText': 'Ali'})
         try:
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -343,3 +343,13 @@ class DataFetcher(TestCase):
         except AssertionError:
             print("test_search_query_too_short: FAILED")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_search_no_results(self):
+        response = self.client.get(self.url, {'searchText': 'Snigdha'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        try:
+            self.assertEqual(len(response.data['search_list']), 0)
+            print("test_search_no_results: PASSED")
+        except AssertionError:
+            print("test_search_no_results: FAILED")
+            self.assertEqual(len(response.data['search_list']), 0)
