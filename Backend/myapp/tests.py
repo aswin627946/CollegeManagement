@@ -353,3 +353,23 @@ class DataFetcher(TestCase):
         except AssertionError:
             print("test_search_no_results: FAILED")
             self.assertEqual(len(response.data['search_list']), 0)
+
+    def test_search_case_insensitivity(self):
+        response = self.client.get(self.url, {'searchText': 'alice'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('search_list', response.data)
+        # self.assertEqual(len(response.data['search_list']), 1)
+        # self.assertEqual(response.data['search_list'][0]['name'], "Alice Johnson")
+        # filter(name=search_query)
+        try:
+            self.assertEqual(len(response.data['search_list']), 1)
+            try:
+                self.assertEqual(response.data['search_list'][0]['name'], "Alice Johnson")
+                print("test_search_case_insensitivity: PASSED")
+            except AssertionError:
+                print("test_search_case_insensitivity: FAILED")
+                self.assertEqual(response.data['search_list'][0]['name'], "Alice Johnson")
+        except AssertionError:
+            print("test_search_case_insensitivity: FAILED")
+            self.assertEqual(len(response.data['search_list']), 1)
+
