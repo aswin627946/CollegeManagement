@@ -866,12 +866,12 @@ def search(request):
         for search_obj in student_results:
             search_list.append({'name': search_obj.name, 'roll_no': search_obj.roll_no, 'department': search_obj.department,
                                'semester': search_obj.semester, 'joining_year': search_obj.joining_year, 'email': search_obj.email})
-        # for search_obj in faculty_results:
-        #     search_list.append({'name': search_obj.name, 'faculty_id': search_obj.faculty_id, 'position': search_obj.position,
-        #                        'description': search_obj.description, 'designation': search_obj.designation, 'email': search_obj.email})
-        # for search_obj in admin_results:
-        #     search_list.append({'name': search_obj.name, 'position': search_obj.position,
-        #                        'staff_id': search_obj.staff_id, 'email': search_obj.email})
+        for search_obj in faculty_results:
+            search_list.append({'name': search_obj.name, 'faculty_id': search_obj.faculty_id, 'position': search_obj.position,
+                               'description': search_obj.description, 'designation': search_obj.designation, 'email': search_obj.email})
+        for search_obj in admin_results:
+            search_list.append({'name': search_obj.name, 'position': search_obj.position,
+                               'staff_id': search_obj.staff_id, 'email': search_obj.email})
         return Response({'search_list': search_list})
     else:
         return Response({'error': 'Please enter a search query with a minimum of 5 characters'}, status=400)
