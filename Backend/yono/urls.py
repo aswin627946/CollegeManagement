@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/getStudentsFromCourseCode/',getStudentsFromCourseCode,name="getStudentsFromCourseCode"),
     path('api/getCoursesForStudents/',getCoursesForStudents,name="getCoursesForStudents"),
     path('api/loginUser/',loginUser,name="loginUser"),
+    path('api/logoutUser/',logoutUser,name="logoutUser"),
     path('api/getUserDetails/',getUserDetails,name="getUserDetails"),
     path('api/getAttendanceDetailsForStudent/',getAttendanceDetailsForStudent,name="getAttendanceDetailsForStudent"),
     path('api/addResult/',addResult,name="Add Result"),

@@ -578,6 +578,28 @@ def cancel_class(request):
     except Exception as e:
         return Response({'error': str(e)}, status=400)
 
+def validate_time_slot(time_slot):
+    try:
+        # Split the time slot into start and end times
+        start_time, end_time = time_slot.split('-')
+        
+        # Further split the start and end times into hours and minutes
+        start_hour, start_minute = map(int, start_time.split(':'))
+        end_hour, end_minute = map(int, end_time.split(':'))
+
+        # Validate hour and minute ranges
+        if (0 <= start_hour < 24 and 0 <= start_minute < 60 and
+                0 <= end_hour < 24 and 0 <= end_minute < 60):
+            # Ensure the start time is before the end time
+            if (start_hour < end_hour) or (start_hour == end_hour and start_minute < end_minute):
+                return True
+
+    except (ValueError, IndexError):
+        # Handle cases where the split does not yield the expected format
+        return False
+
+    return False
+
 @api_view(['POST'])
 def insertAttendance(request):
     print("insert insert attendance")
@@ -588,6 +610,35 @@ def insertAttendance(request):
     time_slot = request.data["time_slot"]
     department = request.data["department"]
     print("department and course id is ",department,course_id)
+    #checking validity of date
+    try:
+        date = datetime.strptime(date, '%Y-%m-%d').date()
+    except ValueError:
+        return Response(
+            {"error": "Invalid date format. Use YYYY-MM-DD."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    #checking validity of course_id
+    try:
+        if (not course_id[0].isalpha()) or (not course_id[1].isalpha()) or (course_id[2] <'0' or course_id[2]>'9') or (course_id[3] <'0' or course_id[3]>'9')or (course_id[4] <'0' or course_id[4]>'9'):
+            raise ValueError("Invalid course ID format.")
+    except ValueError as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    #validating time slot
+    try:
+        if not validate_time_slot(time_slot):
+            raise ValueError("Invalid time slot")
+    except ValueError as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     if request.data["count"] == 0:
         total_classes = CurrentCourses.objects.filter(department=department,course_code=course_id)[0].total_classes
         CurrentCourses.objects.filter(department=department,course_code=course_id).update(total_classes=total_classes+1)
@@ -691,8 +742,12 @@ def getAttendanceDetailsForStudent(request):
 
 @api_view(['POST'])
 def loginUser(request):
-    username = request.data['username']
-    password = request.data['password']
+    username=None
+    password=None
+    if 'username' in request.data.keys() :
+        username = request.data['username']
+    if 'password' in request.data.keys() :
+        password = request.data['password']
     if username and password:
         user = authenticate(username = username, password = password)
         authenticated=False
@@ -700,9 +755,21 @@ def loginUser(request):
             login(request,user)
             authenticated=True
         return Response({'authenticated':authenticated})
+    else : 
+        if username : 
+
+            return Response(
+                {"error": "Missing Password "},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        else :
+            return Response(
+            {"error": "Missing Username."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
         
 
-
+@api_view(['POST'])
 def logoutUser(request):
     logout(request)
     return Response({'authenticated':False})
